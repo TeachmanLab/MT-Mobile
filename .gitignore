@@ -1,0 +1,23 @@
+# Expo
+.expo
+__generated__
+web-build
+src/frontend/.expo/
+src/frontend/__generated__/
+src/frontend/web-build/
+
+# macOS
+.DS_Store
+
+.vscode
+.pytest_cache
+__pycache__/
+
+src/frontend/node_modules/
+
+# Jest 
+src/frontend/__tests__/clover.xml
+src/frontend/__tests__/lcov.info
+src/frontend/__tests__/coverage-final.json
+src/frontend/__tests__/__snapshots__/*
+src/frontend/__tests__/lcov-report/*
