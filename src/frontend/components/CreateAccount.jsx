@@ -18,23 +18,23 @@ export default class CreateAccount extends Component {
       email: '',
       phone: '',
       password: '',
-      confirmPassword: '',
-      emailReminders: false,
-      textMessages: false,
-      textReminders: false,
-      giftCards: false,
-      legalAge: false,
-      notRobot: false,
-      passwordsMatch: true,
-      failedRegistration: false,
-      activeSections: [],
+      confirmpassword: '',
+      emailreminders: false,
+      textmessages: false,
+      textreminders: false,
+      giftcards: false,
+      legalage: false,
+      notrobot: false,
+      passwordsmatch: true,
+      failedregistration: false,
+      activesections: [],
     };
     this.register = this.register.bind(this);
   }
 
-  setSections = (sections) => {
-    this.setState({
-      activeSections: sections.includes(undefined) ? [] : sections,
+  setsections = (sections) => {
+    this.setstate({
+      activesections: sections.includes(undefined) ? [] : sections,
     });
   };
 
