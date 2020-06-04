@@ -33,7 +33,40 @@ export async function saveAnswers(token, formName, questionIndex, answer) {
   }
 }
 
-async function login(data) {
+export async function register(data) {
+  try {
+    const path = `${apiPath}signup`;
+
+    const response = await fetch(path, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    const responseJson = await response.json();
+
+    if (responseJson.code !== 'success') {
+      // TODO: add messages specifying reason for failure, backend should provide
+      return {
+        code: 'error',
+        errorMessage: 'There was an error creating your account, please try again.',
+      };
+    }
+
+    return {
+      code: 'success',
+    };
+  } catch (error) {
+    return {
+      code: 'error',
+      errorMessage: 'There was an error creating your account, please try again.',
+    };
+  }
+}
+
+export async function login(data) {
   try {
     const { email, password } = data;
     const path = `${apiPath}login`;
@@ -65,39 +98,6 @@ async function login(data) {
     return {
       code: 'error',
       errorMessage: 'There was an error logging you in',
-    };
-  }
-}
-
-async function register(data) {
-  try {
-    const path = `${apiPath}signup`;
-
-    const response = await fetch(path, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    const responseJson = await response.json();
-
-    if (responseJson.code !== 'success') {
-      // TODO: add messages specifying reason for failure, backend should provide
-      return {
-        code: 'error',
-        errorMessage: 'There was an error creating your account, please try again.',
-      };
-    }
-
-    return {
-      code: 'success',
-    };
-  } catch (error) {
-    return {
-      code: 'error',
-      errorMessage: 'There was an error creating your account, please try again.',
     };
   }
 }

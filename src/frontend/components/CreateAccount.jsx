@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import { Button, Card, Divider, Header, Icon, CheckBox } from 'react-native-elements';
-import { View, Text, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, TextInput, Alert } from 'react-native';
 import Accordion from 'react-native-collapsible/Accordion';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { staticParagraphs } from '../assets/text/CreateAccountText';
-import { apiPath } from '../apiServices.jsx';
 import AppText from './AppText.jsx';
-
-
-const paragraphs = staticParagraphs;
+import { register } from '../apiServices.jsx';
 
 export default class CreateAccount extends Component {
   constructor(props) {
@@ -18,100 +15,45 @@ export default class CreateAccount extends Component {
       email: '',
       phone: '',
       password: '',
-      confirmpassword: '',
-      emailreminders: false,
-      textmessages: false,
-      textreminders: false,
-      giftcards: false,
-      legalage: false,
-      notrobot: false,
-      passwordsmatch: true,
-      failedregistration: false,
-      activesections: [],
+      confirmPassword: '',
+      emailReminders: false,
+      textMessages: false,
+      textReminders: false,
+      giftCards: false,
+      legalAge: false,
+      notRobot: false,
+      passwordsMatch: true,
+      activeSections: [],
     };
-    this.register = this.register.bind(this);
+    this.validateAndRegister = this.validateAndRegister.bind(this);
   }
 
   setsections = (sections) => {
-    this.setstate({
-      activesections: sections.includes(undefined) ? [] : sections,
+    this.setState({
+      activeSections: sections.includes(undefined) ? [] : sections,
     });
   };
 
-  async register() {
+  async validateAndRegister() {
     try {
-      const { navigation } = this.props;
       const { password, confirmPassword, legalAge, notRobot, name, email, phone } = this.state;
-      const passwordsMatch = password === confirmPassword;
 
-      let errReason = null;
-      if (!name) {
-        errReason = 'First Name/Nickname is required';
-      } else if (!email) {
-        errReason = 'Email is required';
-      } else if (!phone) {
-        errReason = 'Phone number is required';
-      } else if (!passwordsMatch) {
-        errReason = 'Passwords do not match';
-      } else if (!password || !confirmPassword) {
-        errReason = 'Password field is required';
-      } else if (!legalAge) {
-        errReason = 'You must be over 18 to participate';
-      } else if (!notRobot) {
-        errReason = 'Select the robot captcha checker';
-      } else if (passwordsMatch && legalAge && notRobot) {
-        const path = `${apiPath}signup`;
-        const response = await fetch(path, {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(this.state),
-        });
-        const responseJson = await response.json();
-        // console.log(responseJson);
-        if (responseJson.code !== 'success') {
-          // this.setState({ failedRegistration: true });
-          errReason = 'There was an error creating your account. Email/Phone might already be taken. Please try again.';
-        } else {
-          navigation.navigate('Login', { go_back_key: navigation.state.key, username: responseJson.username });
-        }
-      } else {
-        errReason = 'There was an error creating your account, please try again.';
-        // this.setState({
-        //   failedRegistration: true,
-        //   errMessage: ,
-        // });
-      }
-      if (errReason) {
-        this.setState({ failedRegistration: true, errMessage: errReason });
-        Alert.alert(
-          'Create Account Failed!',
-          errReason,
-          [
-            {
-              text: 'Ok',
-            },
-          ],
-          { cancelable: false },
-        );
-      }
+      // Validate form data
+      // TODO: Instead of just returning message, maybe return something indicating where screen should be scrolled to fix form error
+      if (!name) return 'First Name/Nickname is required';
+      if (!email) return 'Email is required';
+      if (!phone) return 'Phone number is required';
+      if (password !== confirmPassword) return 'Passwords do not match';
+      if (!password || !confirmPassword) return 'Password field is required';
+      if (!legalAge) return 'You must be over 18 to participate';
+      if (!notRobot) return 'Select the robot captcha checker';
+
+      const response = await register();
+
+      if (response.code !== 'success') return response.errorReason;
+      return 'Success';
     } catch (error) {
-      this.setState({
-        failedRegistration: true,
-        errMessage: 'There was an error creating your account, please try again.',
-      });
-      Alert.alert(
-        'Create Account Failed!',
-        'There was an error creating your account, please try again.',
-        [
-          {
-            text: 'Ok',
-          },
-        ],
-        { cancelable: false },
-      );
+      return 'There was an error creating your account, please try again.';
     }
   }
 
@@ -127,7 +69,6 @@ export default class CreateAccount extends Component {
   render() {
     const {
       activeSections,
-      failedRegistration,
       emailReminders,
       textMessages,
       textReminders,
@@ -135,7 +76,6 @@ export default class CreateAccount extends Component {
       passwordsMatch,
       legalAge,
       notRobot,
-      errMessage,
     } = this.state;
 
     return (
@@ -154,7 +94,7 @@ export default class CreateAccount extends Component {
               // For any default active section
               activeSections={activeSections}
               // Title and content of accordion
-              sections={paragraphs}
+              sections={staticParagraphs}
               // For pararagraph header
               renderHeader={this.renderHeader}
               // For paragraph text
@@ -176,7 +116,6 @@ export default class CreateAccount extends Component {
             borderRadius={5}
           >
             <Divider style={{ marginBottom: '3%' }} />
-            {failedRegistration && <AppText style={styles.errorText}>{errMessage}</AppText>}
             <TextInput
               name="name"
               placeholder="First Name/Nickname*"
@@ -313,7 +252,22 @@ export default class CreateAccount extends Component {
                 height: '100%',
                 alignSelf: 'center',
               }}
-              onPress={this.register}
+              onPress={async () => {
+                const response = await this.validateAndRegister();
+                if (response === 'success') {
+                  // Navigate
+                }
+                Alert.alert(
+                  'Create Account Failed!',
+                  response,
+                  [
+                    {
+                      text: 'Ok',
+                    },
+                  ],
+                  { cancelable: false },
+                );
+              }}
               title={<AppText>Give Consent and Create Account</AppText>}
             />
           </Card>
