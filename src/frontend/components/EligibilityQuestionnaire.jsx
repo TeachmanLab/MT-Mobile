@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { Formly, FormlyConfig } from 'react-native-formly';
 import { Header, Card, Button, Divider } from 'react-native-elements';
 import { apiPath } from '../apiServices.jsx';
@@ -91,7 +91,7 @@ export default class EligibilityQuestionnaire extends Component {
       const tempModel = { ...this.state };
       delete tempModel.eligibleAnswers;
       newModel = { ...newModel, ...tempModel };
-      const path = `${apiPath}eligible`;
+      const path = 'http://127.0.0.1:5000/api/eligible';
       const response = await fetch(path, {
         method: 'POST',
         headers: {

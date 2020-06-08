@@ -5,7 +5,7 @@ import Accordion from 'react-native-collapsible/Accordion';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { staticParagraphs } from '../assets/text/CreateAccountText';
 import AppText from './AppText.jsx';
-import { register } from '../apiServices.jsx';
+import api from '../apiServices.jsx';
 
 export default class CreateAccount extends Component {
   constructor(props) {
@@ -28,34 +28,31 @@ export default class CreateAccount extends Component {
     this.validateAndRegister = this.validateAndRegister.bind(this);
   }
 
-  setsections = (sections) => {
+  async validateAndRegister() {
+    const { password, confirmPassword, legalAge, notRobot, name, email, phone } = this.state;
+
+    // Validate form data
+    if (!name) return 'First Name/Nickname is required';
+    if (!email) return 'Email is required';
+    if (!phone) return 'Phone number is required';
+    if (!password || !confirmPassword) return 'Password field is required';
+    if (password !== confirmPassword) return 'Passwords do not match';
+    if (!legalAge) return 'You must be over 18 to participate';
+    if (!notRobot) return 'Select the robot captcha checker';
+
+    const response = await api.register(this.state);
+
+    // For debugging
+    // console.log(response);
+
+    return response.code === 'success' ? 'success' : response.errorMessage;
+  }
+
+  setSections = (sections) => {
     this.setState({
       activeSections: sections.includes(undefined) ? [] : sections,
     });
   };
-
-  async validateAndRegister() {
-    try {
-      const { password, confirmPassword, legalAge, notRobot, name, email, phone } = this.state;
-
-      // Validate form data
-      // TODO: Instead of just returning message, maybe return something indicating where screen should be scrolled to fix form error
-      if (!name) return 'First Name/Nickname is required';
-      if (!email) return 'Email is required';
-      if (!phone) return 'Phone number is required';
-      if (password !== confirmPassword) return 'Passwords do not match';
-      if (!password || !confirmPassword) return 'Password field is required';
-      if (!legalAge) return 'You must be over 18 to participate';
-      if (!notRobot) return 'Select the robot captcha checker';
-
-      const response = await register();
-
-      if (response.code !== 'success') return response.errorReason;
-      return 'Success';
-    } catch (error) {
-      return 'There was an error creating your account, please try again.';
-    }
-  }
 
   renderHeader = (section) => (
     <View style={styles.row}>
@@ -78,17 +75,13 @@ export default class CreateAccount extends Component {
       notRobot,
     } = this.state;
 
+    const { navigation } = this.props;
+
     return (
       <View style={{ flex: 1, backgroundColor: '#E5E7ED' }}>
-        <Header
-          alignSelf="center"
-          centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }}
-        />
+        <Header alignSelf="center" centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }} />
         <ScrollView style={styles.scrollContainer}>
-          <Card
-            title={<AppText style={styles.title}>Information</AppText>}
-            borderRadius={5}
-          >
+          <Card title={<AppText style={styles.title}>Information</AppText>} borderRadius={5}>
             <Divider style={{ marginBottom: '3%' }} />
             <Accordion
               // For any default active section
@@ -102,7 +95,6 @@ export default class CreateAccount extends Component {
               // Setting the state of active sections
               onChange={this.setSections}
             />
-
             <AppText style={styles.sectionText}>
               To obtain more information about the study, ask questions about the research procedures, express concerns
               about your participation, or report illness, injury or other problems, please contact: Tonya Moon, Chair,
@@ -111,10 +103,7 @@ export default class CreateAccount extends Component {
               irbsbshelp@virginia.edu; Website: www.virginia.edu/vprgs/irb.
             </AppText>
           </Card>
-          <Card
-            title={<AppText style={styles.title}>Create An Account</AppText>}
-            borderRadius={5}
-          >
+          <Card title={<AppText style={styles.title}>Create An Account</AppText>} borderRadius={5}>
             <Divider style={{ marginBottom: '3%' }} />
             <TextInput
               name="name"
@@ -137,15 +126,17 @@ export default class CreateAccount extends Component {
             />
             <CheckBox
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               checked={emailReminders}
               onPress={() => this.setState({ emailReminders: !emailReminders })}
-              title={<AppText style={styles.checkText}>I would like to receive email reminders when it is time to start the next session. Please note that even if you do not want reminders for each session, you will still receive a few messages from us as you enter new phases in the study or if you are inactive for an extended period.</AppText>}
+              title={
+                <AppText style={styles.checkText}>
+                  I would like to receive email reminders when it is time to start the next session. Please note that
+                  even if you do not want reminders for each session, you will still receive a few messages from us as
+                  you enter new phases in the study or if you are inactive for an extended period.
+                </AppText>
+              }
             />
             <TextInput
               placeholder="Phone*"
@@ -159,39 +150,36 @@ export default class CreateAccount extends Component {
             <CheckBox
               value={false}
               checked={textMessages}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               onPress={() => this.setState({ textMessages: !textMessages })}
               containerStyle={styles.checkbox}
               title={<AppText style={styles.checkText}>I can receive text messages at this number.</AppText>}
             />
             <CheckBox
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               checked={textReminders}
               onPress={() => this.setState({ textReminders: !textReminders })}
-              title={<AppText style={styles.checkText}>I would like to receive text reminders to this phone when it is time to start the next session.</AppText>}
+              title={
+                <AppText style={styles.checkText}>
+                  I would like to receive text reminders to this phone when it is time to start the next session.
+                </AppText>
+              }
             />
             <CheckBox
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               checked={giftCards}
               onPress={() => this.setState({ giftCards: !giftCards })}
-              title={<AppText style={styles.checkText}>I’d like to receive gift cards for my participation (we will send a text message to your phone to verify your identity, this must be completed to receive gift cards.)</AppText>}
+              title={
+                <AppText style={styles.checkText}>
+                  I’d like to receive gift cards for my participation (we will send a text message to your phone to
+                  verify your identity, this must be completed to receive gift cards.)
+                </AppText>
+              }
             />
             {!passwordsMatch && <AppText style={styles.errorText}>Your passwords did not match.</AppText>}
             <TextInput
@@ -217,32 +205,23 @@ export default class CreateAccount extends Component {
             <CheckBox
               containerStyle={styles.checkbox}
               checked={legalAge}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               onPress={() => this.setState({ legalAge: !legalAge })}
               title={<AppText style={styles.checkText}>I am over 18</AppText>}
             />
             <CheckBox
               containerStyle={styles.checkbox}
               checked={notRobot}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               onPress={() => this.setState({ notRobot: !notRobot })}
-              title={<AppText style={styles.checkText}>I'm not a robot</AppText>}
+              title={<AppText style={styles.checkText}>I`&apos`m not a robot</AppText>}
             />
             <Divider style={{ marginBottom: '3%' }} />
-            {/* Consent to Agreement and Create Account Section */}
             <AppText style={styles.sectionText}>
-              By clicking the button below you are indicating that you have read the informed consent statement above and
-              agree to participate.
+              By clicking the button below you are indicating that you have read the informed consent statement above
+              and agree to participate.
             </AppText>
             <Button
               buttonStyle={{ backgroundColor: '#48AADF' }}
@@ -255,18 +234,19 @@ export default class CreateAccount extends Component {
               onPress={async () => {
                 const response = await this.validateAndRegister();
                 if (response === 'success') {
-                  // Navigate
+                  navigation.navigate('Login');
+                } else {
+                  Alert.alert(
+                    'Create Account Failed!',
+                    response,
+                    [
+                      {
+                        text: 'Ok',
+                      },
+                    ],
+                    { cancelable: false },
+                  );
                 }
-                Alert.alert(
-                  'Create Account Failed!',
-                  response,
-                  [
-                    {
-                      text: 'Ok',
-                    },
-                  ],
-                  { cancelable: false },
-                );
               }}
               title={<AppText>Give Consent and Create Account</AppText>}
             />
