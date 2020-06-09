@@ -5,6 +5,7 @@ import { ScrollView, View, StyleSheet } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AppText from './AppText.jsx';
 import { levels } from './Json/LevelsJson.js';
+import { connect } from 'react-redux';
 
 export default class Progress extends Component {
   constructor(props) {
@@ -31,15 +32,12 @@ export default class Progress extends Component {
     const finished = formIndex === levels.length;
     const currTitle = finished ? '' : levels[formIndex].title;
 
-    const alertHeader = formIndex === 0 && questionIndex === -1
-      ? `Welcome ${name}!`
-      : `Welcome back ${name}!`;
-    const alertText = formIndex === 0 && questionIndex === -1
-      ? 'You are ready to begin your first study!'
-      : `If you are ready to continue with ${currTitle}, please click continue below.`;
-    const buttonLabel = formIndex === 0 && questionIndex === -1
-      ? 'Start'
-      : 'Continue';
+    const alertHeader = formIndex === 0 && questionIndex === -1 ? `Welcome ${name}!` : `Welcome back ${name}!`;
+    const alertText =
+      formIndex === 0 && questionIndex === -1
+        ? 'You are ready to begin your first study!'
+        : `If you are ready to continue with ${currTitle}, please click continue below.`;
+    const buttonLabel = formIndex === 0 && questionIndex === -1 ? 'Start' : 'Continue';
 
     return (
       <View style={{ flex: 1, backgroundColor: '#E5E7ED' }}>
@@ -52,32 +50,16 @@ export default class Progress extends Component {
         />
         <ScrollView style={styles.container}>
           {finished ? (
-            <Card
-              title={(
-                <AppText style={styles.overviewText}>
-                  {alertHeader}
-                </AppText>
-              )}
-              borderRadius={5}
-            >
+            <Card title={<AppText style={styles.overviewText}>{alertHeader}</AppText>} borderRadius={5}>
               <Divider style={{ marginBottom: '3%' }} />
               <AppText style={styles.waitText}>
                 You have finished all available modules. We will notify you when more become available.
               </AppText>
             </Card>
           ) : (
-            <Card
-              title={(
-                <AppText style={styles.overviewText}>
-                  {alertHeader}
-                </AppText>
-              )}
-              borderRadius={5}
-            >
+            <Card title={<AppText style={styles.overviewText}>{alertHeader}</AppText>} borderRadius={5}>
               <Divider style={{ marginBottom: '3%' }} />
-              <AppText style={styles.waitText}>
-                {alertText}
-              </AppText>
+              <AppText style={styles.waitText}>{alertText}</AppText>
               <Button
                 containerStyle={styles.startButton}
                 buttonStyle={{ backgroundColor: '#48AADF' }}
@@ -93,10 +75,7 @@ export default class Progress extends Component {
               />
             </Card>
           )}
-          <Card
-            title={<AppText style={styles.overviewText}>Your Progress</AppText>}
-            borderRadius={5}
-          >
+          <Card title={<AppText style={styles.overviewText}>Your Progress</AppText>} borderRadius={5}>
             {levels.map((level, i) => (
               <View key={level.title}>
                 <Card
@@ -104,69 +83,29 @@ export default class Progress extends Component {
                   title={
                     i < formIndex ? (
                       <AppText style={styles.headerText}>
-                        {level.title}
-                        {' '}
-                        <MaterialCommunityIcons name="check-circle" size={24} />
+                        {level.title} <MaterialCommunityIcons name="check-circle" size={24} />
                       </AppText>
                     ) : (
                       <AppText style={styles.headerText}>
-                        {level.title}
-                        {' '}
-                        <MaterialCommunityIcons name="progress-check" size={24} />
+                        {level.title} <MaterialCommunityIcons name="progress-check" size={24} />
                       </AppText>
                     )
                   }
                   borderRadius={5}
                 >
                   <Divider style={{ marginBottom: '3%' }} />
-                  {i < formIndex
-                  && (
+                  {i < formIndex && <AppText style={styles.surveyText}>Status: Complete</AppText>}
+                  {i === formIndex && questionIndex === -1 && (
+                    <AppText style={styles.surveyText}>Status: Not Started</AppText>
+                  )}
+                  {i === formIndex && questionIndex !== -1 && (
                     <AppText style={styles.surveyText}>
-                      Status:
-                      {' '}
-                      Complete
+                      Status: Question {questionIndex + 1} of {level.numQuestions}
                     </AppText>
                   )}
-                  {i === formIndex && questionIndex === -1
-                  && (
-                    <AppText style={styles.surveyText}>
-                      Status:
-                      {' '}
-                      Not Started
-                    </AppText>
-                  )}
-                  {i === formIndex && questionIndex !== -1
-                  && (
-                    <AppText style={styles.surveyText}>
-                      Status:
-                      {' '}
-                      Question
-                      {' '}
-                      {questionIndex + 1}
-                      {' '}
-                      of
-                      {' '}
-                      {level.numQuestions}
-
-                    </AppText>
-                  )}
-                  {i > formIndex
-                  && (
-                    <AppText style={styles.surveyText}>
-                      Status:
-                      {' '}
-                      Not Started
-                    </AppText>
-                  )}
-                  {i >= formIndex
-                  && (
-                    <AppText style={styles.surveyText}>
-                      Estimated duration:
-                      {' '}
-                      {level.duration}
-                      {' '}
-                      minutes
-                    </AppText>
+                  {i > formIndex && <AppText style={styles.surveyText}>Status: Not Started</AppText>}
+                  {i >= formIndex && (
+                    <AppText style={styles.surveyText}>Estimated duration: {level.duration} minutes</AppText>
                   )}
                 </Card>
               </View>

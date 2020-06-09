@@ -22,7 +22,6 @@ export default class CreateAccount extends Component {
       giftCards: false,
       legalAge: false,
       notRobot: false,
-      passwordsMatch: true,
       activeSections: [],
     };
     this.validateAndRegister = this.validateAndRegister.bind(this);
@@ -41,9 +40,6 @@ export default class CreateAccount extends Component {
     if (!notRobot) return 'Select the robot captcha checker';
 
     const response = await api.register(this.state);
-
-    // For debugging
-    // console.log(response);
 
     return response.code === 'success' ? 'success' : response.errorMessage;
   }
@@ -64,17 +60,7 @@ export default class CreateAccount extends Component {
   renderContent = (section) => <AppText style={styles.sectionText}>{section.content}</AppText>;
 
   render() {
-    const {
-      activeSections,
-      emailReminders,
-      textMessages,
-      textReminders,
-      giftCards,
-      passwordsMatch,
-      legalAge,
-      notRobot,
-    } = this.state;
-
+    const { activeSections, emailReminders, textMessages, textReminders, giftCards, legalAge, notRobot } = this.state;
     const { navigation } = this.props;
 
     return (
@@ -84,15 +70,10 @@ export default class CreateAccount extends Component {
           <Card title={<AppText style={styles.title}>Information</AppText>} borderRadius={5}>
             <Divider style={{ marginBottom: '3%' }} />
             <Accordion
-              // For any default active section
               activeSections={activeSections}
-              // Title and content of accordion
               sections={staticParagraphs}
-              // For pararagraph header
               renderHeader={this.renderHeader}
-              // For paragraph text
               renderContent={this.renderContent}
-              // Setting the state of active sections
               onChange={this.setSections}
             />
             <AppText style={styles.sectionText}>
@@ -181,7 +162,6 @@ export default class CreateAccount extends Component {
                 </AppText>
               }
             />
-            {!passwordsMatch && <AppText style={styles.errorText}>Your passwords did not match.</AppText>}
             <TextInput
               placeholder="Password*"
               style={styles.input}

@@ -25,7 +25,6 @@ const Hidden = () => null;
 // Sub-pages (Eligibility Questionnaire, Eligible, Ineligible) should have a drawer label of hidden to avoid appearing in the drawer
 const MyDrawerNavigator = createDrawerNavigator(
   {
-
     'Account Settings': {
       screen: AccountSettings,
     },
@@ -76,7 +75,6 @@ const MyDrawerNavigator = createDrawerNavigator(
     },
     Login: {
       screen: Login,
-      // options: { unmountOnBlur: true },
       unmountOnBlur: true,
       navigationOptions: {
         drawerLabel: <Hidden />,
@@ -88,24 +86,6 @@ const MyDrawerNavigator = createDrawerNavigator(
         drawerLabel: <Hidden />,
       },
     },
-    // 'Account Settings': {
-    //   screen: AccountSettings,
-    //   navigationOptions: {
-    //     drawerLabel: <Hidden />,
-    //   },
-    // },
-    // 'Edit Information': {
-    //   screen: EditInformation,
-    //   navigationOptions: {
-    //     drawerLabel: <Hidden />,
-    //   },
-    // },
-    // 'Exit the Study': {
-    //   screen: ExitStudy,
-    //   navigationOptions: {
-    //     drawerLabel: <Hidden />,
-    //   },
-    // },
     Debrief: {
       screen: Debrief,
       navigationOptions: {
@@ -123,9 +103,8 @@ const MyDrawerNavigator = createDrawerNavigator(
     initialRouteName: 'Log Out',
     drawerType: 'front',
     drawerPosition: 'right',
-    // unmountInactiveRoutes: true,
   },
 );
-// Container to pass the drawer navigator in the app, this will be the main component exported by the app
+
 const Navigation = createAppContainer(MyDrawerNavigator);
 export default Navigation;
