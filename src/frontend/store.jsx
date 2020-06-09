@@ -2,13 +2,14 @@ import { createAsyncThunk, combineReducers, createSlice, configureStore } from '
 import api from './apiServices.jsx';
 
 const initialState = {
+  error: false,
+  errorMessage: '',
   isLoggedIn: false,
   isLoading: false,
   token: '',
-  error: false,
-  errorMessage: '',
   formIndex: -1,
   questionIndex: -1,
+  name: '',
   forms: [],
 };
 
@@ -32,11 +33,11 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: {
     [login.fulfilled]: (state, action) => {
-      state.isLoggedIn = true;
       state.token = action.payload.token;
       state.name = action.payload.name;
-      state.formindex = action.payload.formindex;
-      state.questionindex = action.payload.questionindex;
+      state.formIndex = action.payload.formIndex;
+      state.questionIndex = action.payload.questionIndex;
+      state.isLoggedIn = true;
     },
     [login.pending]: (state) => {
       state.isLoading = true;

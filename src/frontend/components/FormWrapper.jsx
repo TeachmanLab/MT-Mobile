@@ -113,7 +113,6 @@ export default class FormWrapper extends Component {
     }
   }
 
-
   // Checks if a question, or one of the transition screens should be read
   toRender(question) {
     const { questionIndex } = this.state;
@@ -153,13 +152,7 @@ export default class FormWrapper extends Component {
       return (
         <View style={{ flex: 19 }}>
           <Card
-            title={(
-              <AppText style={styles.formTitle}>
-                Congratulations, you completed
-                {' '}
-                {config.title}
-              </AppText>
-            )}
+            title={<AppText style={styles.formTitle}>Congratulations, you completed {config.title}</AppText>}
             borderRadius={5}
             containerStyle={styles.cardContainer}
           />
@@ -256,19 +249,21 @@ export default class FormWrapper extends Component {
               text: 'MindTrails',
               style: { fontSize: 24, color: '#fff' },
             }}
-            rightComponent={(
+            rightComponent={
               <Icon
-                onPress={() => navigation.navigate('Progress', {
-                  formIndex,
-                  questionIndex,
-                  numForms: forms.length,
-                })}
+                onPress={() =>
+                  navigation.navigate('Progress', {
+                    formIndex,
+                    questionIndex,
+                    numForms: forms.length,
+                  })
+                }
                 size={35}
                 name="home"
                 type="font-awesome"
                 color="white"
               />
-            )}
+            }
           />
         </View>
       );
@@ -283,19 +278,21 @@ export default class FormWrapper extends Component {
             text: 'MindTrails',
             style: { fontSize: 24, color: '#fff' },
           }}
-          rightComponent={(
+          rightComponent={
             <Icon
-              onPress={() => navigation.navigate('Progress', {
-                formIndex,
-                questionIndex,
-                numForms: forms.length,
-              })}
+              onPress={() =>
+                navigation.navigate('Progress', {
+                  formIndex,
+                  questionIndex,
+                  numForms: forms.length,
+                })
+              }
               size={35}
               name="home"
               type="font-awesome"
               color="white"
             />
-          )}
+          }
         />
         {!atEnd && !atBeginning && (
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -310,9 +307,7 @@ export default class FormWrapper extends Component {
               borderRadius={3}
             >
               <AppText style={{ position: 'absolute', alignSelf: 'center', fontSize: 15 }}>
-                {questionIndex + 1}
-                /
-                {forms[formIndex].fields.length}
+                {questionIndex + 1}/{forms[formIndex].fields.length}
               </AppText>
             </Progress.Bar>
           </View>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { AppLoading } from 'expo';
 import { Button, Card, Header } from 'react-native-elements';
@@ -21,6 +21,7 @@ export default function Login(props) {
   }
 
   if (isLoading) {
+    // This can eventually be a spinner/etc.
     return <AppLoading />;
   }
 
