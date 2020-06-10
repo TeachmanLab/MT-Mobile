@@ -109,7 +109,7 @@ export default class AccountSettings extends Component {
         <Header
           alignSelf="center"
           centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }}
-          rightComponent={(
+          rightComponent={
             <Icon
               onPress={() => this.props.navigation.toggleDrawer()}
               size={40}
@@ -117,28 +117,13 @@ export default class AccountSettings extends Component {
               type="evilicon"
               color="white"
             />
-          )}
+          }
         />
         <ScrollView style={styles.scrollContainer}>
-          <Card
-            title={<AppText style={styles.title}>Update Account Info</AppText>}
-            borderRadius={5}
-          >
+          <Card title={<AppText style={styles.title}>Update Account Info</AppText>} borderRadius={5}>
             <Divider style={{ marginBottom: '3%' }} />
-            {!errorMessage && successMessage && (
-              <AppText style={styles.successStyle}>
-                {' '}
-                {successMessage}
-                {' '}
-              </AppText>
-            )}
-            {errorMessage && (
-              <AppText style={styles.errorStyle}>
-                {' '}
-                {errorMessage}
-                {' '}
-              </AppText>
-            )}
+            {!errorMessage && successMessage && <AppText style={styles.successStyle}> {successMessage} </AppText>}
+            {errorMessage && <AppText style={styles.errorStyle}> {errorMessage} </AppText>}
             <TextInput
               style={styles.input}
               placeholder="First Name/Nickname"
@@ -159,15 +144,17 @@ export default class AccountSettings extends Component {
             />
             <CheckBox
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               checked={this.state.emailReminders}
               onPress={() => this.setState({ emailReminders: !this.state.emailReminders })}
-              title={<AppText style={styles.checkText}>I would like to receive email reminders when it is time to start the next session. Please note that even if you do not want reminders for each session, you will still receive a few messages from us as you enter new phases in the study or if you are inactive for an extended period.</AppText>}
+              title={
+                <AppText style={styles.checkText}>
+                  I would like to receive email reminders when it is time to start the next session. Please note that
+                  even if you do not want reminders for each session, you will still receive a few messages from us as
+                  you enter new phases in the study or if you are inactive for an extended period.
+                </AppText>
+              }
             />
             <TextInput
               style={styles.input}
@@ -195,25 +182,21 @@ export default class AccountSettings extends Component {
               checked={this.state.textMessages}
               onPress={() => this.setState({ textMessages: !this.state.textMessages })}
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               title={<AppText style={styles.checkText}>I can receive text messages at this number.</AppText>}
             />
             <CheckBox
               containerStyle={styles.checkbox}
-              checkedIcon={
-                <MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />
-              }
-              uncheckedIcon={
-                <MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />
-              }
+              checkedIcon={<MaterialCommunityIcons name="checkbox-blank" size={24} color="#48AADF" />}
+              uncheckedIcon={<MaterialCommunityIcons name="checkbox-blank-outline" size={24} color="grey" />}
               checked={this.state.textReminders}
               onPress={() => this.setState({ textReminders: !this.state.textReminders })}
-              title={<AppText style={styles.checkText}>I would like to receive text reminders to this phone when it is time to start the next session.</AppText>}
+              title={
+                <AppText style={styles.checkText}>
+                  I would like to receive text reminders to this phone when it is time to start the next session.
+                </AppText>
+              }
             />
 
             <Button

@@ -6,13 +6,19 @@ import { Button, Card, Header } from 'react-native-elements';
 import { login } from '../store.jsx';
 import AppText from './AppText.jsx';
 
-export default function Login(props) {
+const Login = (props) => {
+  const validateAndLogin = async () => {
+    if (!email) return 'Please enter your email';
+    if (!password) return 'Please enter a password';
+
+    const response = await dispatch(login({ email, password }));
+    return response;
+  };
+
   const mtLogo = require('../assets/logo.png');
   const navigation = props.navigation;
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const dispatch = useDispatch();
   const { isLoggedIn, isLoading, error, errorMessage } = useSelector((state) => state.userReducer);
 
@@ -21,21 +27,11 @@ export default function Login(props) {
   }
 
   if (isLoading) {
-    // This can eventually be a spinner/etc.
     return <AppLoading />;
   }
 
-  const validateAndLogin = async () => {
-    if (!email) return 'Please enter your email';
-    if (!password) return 'Please enter a password';
-
-    const response = await dispatch(login({ email, password }));
-    console.log(response);
-    return response;
-  };
-
   return (
-    <View style={styles.outerContainer}>
+    <View style={{ flex: 1 }}>
       <Header alignSelf="center" centerComponent={{ text: 'MindTrails', style: styles.mtText }} />
       <View style={styles.container}>
         <Card
@@ -78,12 +74,9 @@ export default function Login(props) {
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -110,10 +103,6 @@ const styles = StyleSheet.create({
   logoStyle: {
     paddingTop: '50%',
   },
-  button: {
-    marginHorizontal: '5%',
-    marginBottom: '30%',
-  },
   input: {
     alignSelf: 'center',
     width: '100%',
@@ -124,3 +113,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+export default Login;

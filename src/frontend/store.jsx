@@ -15,16 +15,21 @@ const initialState = {
 
 export const login = createAsyncThunk('users/login', async (loginData, { rejectWithValue }) => {
   const response = await api.login(loginData);
-  console.log(response);
+  console.log('Login response; ' + response);
   if (response.code === 'success') {
     return response;
   }
   return rejectWithValue('There was an error logging you in, please try again');
 });
 
-const progress = createAsyncThunk('users/progress', async (token) => {
-  const response = await api.progress(token);
-  return response;
+export const getForms = createAsyncThunk('users/getForms', async (_, { getState, rejectWithValue }) => {
+  const { token } = getState().userReducer;
+  console.log('user token: ' + token);
+  const response = await api.getForms(token);
+  if (response.code === 'success') {
+    return response;
+  }
+  return rejectWithValue('There was an error fetching forms, please try again');
 });
 
 const userSlice = createSlice({
@@ -34,6 +39,7 @@ const userSlice = createSlice({
   extraReducers: {
     [login.fulfilled]: (state, action) => {
       state.token = action.payload.token;
+      console.log(state.token);
       state.name = action.payload.name;
       state.formIndex = action.payload.formIndex;
       state.questionIndex = action.payload.questionIndex;
@@ -45,11 +51,23 @@ const userSlice = createSlice({
     [login.rejected]: (state, action) => {
       state.isLoading = false;
       state.error = true;
-      console.log(action);
       state.errorMessage = action.payload;
     },
-    [progress.fulfilled]: (state, action) => {
-      state.token = action.payload.token;
+    [getForms.fulfilled]: (state, action) => {
+      console.log('get forms fulfilled');
+      console.log(action.payload);
+      state.isLoading = false;
+      state.forms = action.payload.forms;
+    },
+    [getForms.pending]: (state) => {
+      state.isLoading = true;
+    },
+    [getForms.rejected]: (state, action) => {
+      console.log('get forms rejected');
+      console.log(action.payload);
+      state.isLoading = false;
+      state.error = true;
+      state.errorMessage = action.payload;
     },
   },
 });

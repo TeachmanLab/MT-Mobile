@@ -7,10 +7,7 @@ import AppText from './AppText.jsx';
 import { levels } from './Json/LevelsJson.js';
 
 const Progress = (props) => {
-  const navigation = props.navigation;
   const { formIndex, questionIndex, name } = useSelector((state) => state.userReducer);
-  console.log(formIndex);
-
   const finished = formIndex === levels.length;
   const currTitle = finished ? '' : levels[formIndex].title;
   const alertHeader = formIndex === 0 && questionIndex === -1 ? `Welcome ${name}!` : `Welcome back ${name}!`;
@@ -26,7 +23,13 @@ const Progress = (props) => {
         alignSelf="center"
         centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }}
         rightComponent={
-          <Icon onPress={() => navigation.toggleDrawer()} size={40} name="navicon" type="evilicon" color="white" />
+          <Icon
+            onPress={() => props.navigation.toggleDrawer()}
+            size={40}
+            name="navicon"
+            type="evilicon"
+            color="white"
+          />
         }
       />
       <ScrollView style={styles.container}>
@@ -46,12 +49,7 @@ const Progress = (props) => {
               buttonStyle={{ backgroundColor: '#48AADF' }}
               title={<AppText style={{ fontSize: 24, color: 'white' }}>{buttonLabel}</AppText>}
               onPress={() => {
-                navigation.navigate('FormWrapper', {
-                  // go_back_key: navigation.state.key,
-                  // formIndex,
-                  // email,
-                  // token,
-                });
+                props.navigation.navigate('FormWrapper');
               }}
             />
           </Card>
@@ -61,6 +59,7 @@ const Progress = (props) => {
             <View key={level.title}>
               <Card
                 containerStyle={{ width: '100%', alignSelf: 'center' }}
+                borderRadius={5}
                 title={
                   i < formIndex ? (
                     <AppText style={styles.headerText}>
@@ -72,19 +71,22 @@ const Progress = (props) => {
                     </AppText>
                   )
                 }
-                borderRadius={5}
               >
                 <Divider style={{ marginBottom: '3%' }} />
                 {i < formIndex && <AppText style={styles.surveyText}>Status: Complete</AppText>}
+
                 {i === formIndex && questionIndex === -1 && (
                   <AppText style={styles.surveyText}>Status: Not Started</AppText>
                 )}
+
                 {i === formIndex && questionIndex !== -1 && (
                   <AppText style={styles.surveyText}>
                     Status: Question {questionIndex + 1} of {level.numQuestions}
                   </AppText>
                 )}
+
                 {i > formIndex && <AppText style={styles.surveyText}>Status: Not Started</AppText>}
+
                 {i >= formIndex && (
                   <AppText style={styles.surveyText}>Estimated duration: {level.duration} minutes</AppText>
                 )}
@@ -102,14 +104,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: '5%',
   },
-  progressContainer: {
-    borderWidth: 1,
-    borderRadius: 20,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    width: '95%',
-    alignSelf: 'center',
-  },
   overviewText: {
     textAlign: 'center',
     color: '#49afeb',
@@ -124,34 +118,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  assessText: {
-    fontWeight: 'bold',
-    fontSize: 32,
-    textAlign: 'center',
-    paddingHorizontal: '1%',
-    paddingVertical: '3%',
-  },
-  bodyText: {
-    fontSize: 18,
-    paddingHorizontal: '4%',
-  },
-  studyText: {
-    textAlign: 'center',
-    fontSize: 22,
-    paddingHorizontal: '5%',
-  },
-  level: {
-    paddingVertical: '10%',
-  },
   startButton: {
     flex: 1,
     width: '100%',
     alignSelf: 'center',
     justifyContent: 'center',
-  },
-  startText: {
-    color: 'white',
-    fontSize: 24,
   },
   waitText: {
     fontSize: 22,

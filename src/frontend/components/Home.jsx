@@ -3,13 +3,14 @@ import { View, ImageBackground, StyleSheet, Dimensions } from 'react-native';
 import { Button } from 'react-native-elements';
 import AppText from './AppText.jsx';
 
-const { height, width } = Dimensions.get('screen');
+const Home = (props) => {
+  const navigation = props.navigation;
+  const { height, width } = Dimensions.get('screen');
+  const backgroundImage = require('./../assets/HomeSplashImage.jpg');
 
-export default function Start(props) {
-  const { navigation } = props;
   return (
     <View style={styles.container}>
-      <ImageBackground source={require('./../assets/HomeSplashImage.jpg')} style={{ height, width }}>
+      <ImageBackground source={backgroundImage} style={{ height, width }}>
         <View style={{ paddingTop: '2%', justifyContent: 'space-between' }}>
           <AppText
             style={{
@@ -23,11 +24,24 @@ export default function Start(props) {
             Think in New Ways
           </AppText>
           <AppText
-            style={{ color: '#00aeef', fontSize: 39, marginVertical: '1%', fontWeight: 'bold', alignSelf: 'center' }}
+            style={{
+              color: '#00aeef',
+              fontSize: 39,
+              marginVertical: '1%',
+              fontWeight: 'bold',
+              alignSelf: 'center',
+            }}
           >
             Feel Less Anxious
           </AppText>
-          <AppText style={{ color: 'white', fontSize: 15, marginVertical: '1%', alignSelf: 'center' }}>
+          <AppText
+            style={{
+              color: 'white',
+              fontSize: 15,
+              marginVertical: '1%',
+              alignSelf: 'center',
+            }}
+          >
             Join for free to change your anxious thinking
           </AppText>
         </View>
@@ -48,7 +62,7 @@ export default function Start(props) {
       </ImageBackground>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -67,3 +81,5 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+
+export default Home;

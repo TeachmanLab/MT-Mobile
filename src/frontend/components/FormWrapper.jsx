@@ -1,11 +1,11 @@
-/* eslint-disable react/no-unused-state */
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Dimensions, View, ScrollView, StyleSheet } from 'react-native';
 import { Card, Button, Divider, Header, Icon } from 'react-native-elements';
 import { Formly, FormlyConfig } from 'react-native-formly';
 import * as Progress from 'react-native-progress';
-import { apiPath, saveAnswers } from '../apiServices.jsx';
 import AppText from './AppText.jsx';
+import { getForms } from '../store.jsx';
 
 const wordFill = require('./FormlyComponents/WordFill');
 const selectPanel = require('./FormlyComponents/SelectPanel');
@@ -27,95 +27,52 @@ FieldsConfig.addType([
   { name: 'panel', component: panel },
 ]);
 
-export default class FormWrapper extends Component {
-  constructor(props) {
-    super(props);
-    const { navigation } = this.props;
-    this.state = {
-      token: navigation.getParam('token', ''),
-      forms: [],
-      formIndex: 0, // what form the user is at
-      questionIndex: -1, // what question within a form is the user at
-      isLoading: true,
-      timerID: 0,
-      duration: 0,
-      // for dev below
-      // forms: forms,
-      // isLoading: false,
-    };
-    this.nextForm = this.nextForm.bind(this);
-    this.nextQuestion = this.nextQuestion.bind(this);
-    this.onFormlyUpdate = this.onFormlyUpdate.bind(this);
-    this.onFormlyValidityChange = this.onFormlyValidityChange.bind(this);
-    this.getProgressAPI = this.getProgressAPI.bind(this);
+const FormWrapper = (props) => {
+  const { isLoading, formIndex, questionIndex, forms } = useSelector((state) => state.userReducer);
+
+  console.log('loading: ' + isLoading);
+  console.log('forms: ' + forms);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getForms({}));
+  }, [isLoading]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        <Header
+          alignSelf="center"
+          centerComponent={{
+            text: 'MindTrails',
+            style: { fontSize: 24, color: '#fff' },
+          }}
+          rightComponent={
+            <Icon
+              onPress={() =>
+                props.navigation.navigate('Progress', {
+                  formIndex,
+                  questionIndex,
+                  numForms: forms.length,
+                })
+              }
+              size={35}
+              name="home"
+              type="font-awesome"
+              color="white"
+            />
+          }
+        />
+      </View>
+    );
   }
 
-  async componentDidMount() {
-    const { navigation } = this.props;
-    try {
-      // if they leave the forms with the navigator and come back, reset the start date (temporary fix).
-      this._unsubscribe = navigation.addListener('didFocus', async () => {
-        try {
-          await this.getProgressAPI();
-        } catch (error) {
-          console.log(error);
-          navigation.navigate('Progress', {});
-        }
-      });
-      await this.getProgressAPI();
-    } catch (error) {
-      console.log(error);
-      navigation.navigate('Progress', {});
-    }
-  }
-
-  componentWillUnmount() {
-    this._unsubscribe();
-  }
-
-  onFormlyUpdate(model) {
-    this.setState({});
-  }
-
-  onFormlyValidityChange(isValid) {
-    this.setState({});
-  }
-
-  async getProgressAPI() {
-    const { navigation } = this.props;
-    try {
-      const token = navigation.getParam('token', null);
-      const path = `${apiPath}progress`;
-      const response = await fetch(path, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      const responseJson = await response.json();
-      // console.log(`question index: ${responseJson.questionIndex}`);
-      if (responseJson.code === 'success') {
-        this.setState({
-          formIndex: responseJson.formIndex,
-          questionIndex: responseJson.questionIndex,
-          forms: responseJson.forms,
-          isLoading: false,
-          startDate: new Date(),
-          token,
-        });
-      } else {
-        navigation.navigate('Progress', {});
-      }
-    } catch (error) {
-      console.log(error);
-      navigation.navigate('Progress', {});
-    }
-  }
+  const screenWidth = Math.round(Dimensions.get('window').width);
+  const atEnd = questionIndex === forms[formIndex].fields.length; // checks if user is at last question in form
+  const atBeginning = questionIndex === -1; // checks if user has not begun form
 
   // Checks if a question, or one of the transition screens should be read
-  toRender(question) {
-    const { questionIndex } = this.state;
+  const toRender = (question) => {
     const config = question; // set to current form object
     const atEnd = questionIndex === config.fields.length; // checks if user is at last question in form
     const atBeginning = questionIndex === -1; // checks if user has not begun form
@@ -146,9 +103,7 @@ export default class FormWrapper extends Component {
         </View>
       );
     }
-    // if qIndex is past end of array
     if (atEnd) {
-      // console.log('At end of form');
       return (
         <View style={{ flex: 19 }}>
           <Card
@@ -159,18 +114,17 @@ export default class FormWrapper extends Component {
           <Button
             buttonStyle={{ backgroundColor: '#48AADF' }}
             containerStyle={styles.buttonContainer}
-            onPress={this.nextForm}
+            onPress={nextForm}
             title={<AppText>Submit</AppText>}
           />
         </View>
       );
     }
-    // middle of form
     return (
       <View style={{ flex: 19 }}>
         <Formly
           config={{
-            fields: [{ ...config.fields[questionIndex], parentTitle: config.title, nextQuestion: this.nextQuestion }],
+            fields: [{ ...config.fields[questionIndex], parentTitle: config.title, nextQuestion }],
           }}
           model={this.state}
           onFormlyUpdate={this.onFormlyUpdate}
@@ -178,15 +132,13 @@ export default class FormWrapper extends Component {
         />
       </View>
     );
-  }
+  };
 
-  async nextQuestion(answerObject) {
-    const endDate = new Date(); // quickly grab the end date for when they asked to go to next question
-    const { token, formIndex, questionIndex, forms, startDate } = this.state;
+  const nextQuestion = async (answerObject) => {
     const newQuestionIndex = questionIndex + 1;
     const success = await saveAnswers(token, forms[formIndex].name, newQuestionIndex, {
       ...answerObject,
-      duration: Math.ceil((endDate - startDate) / 1000), // ceiling so that rounding doesn't say 0 for 0.4 sec
+      duration: 0, // ceiling so that rounding doesn't say 0 for 0.4 sec
     });
 
     if (success) {
@@ -195,22 +147,15 @@ export default class FormWrapper extends Component {
         startDate: new Date(),
       });
     }
-  }
+  };
 
   // increments formIndex when end of form is reached
-  async nextForm() {
-    const { forms, formIndex } = this.state;
-    const { navigation } = this.props;
+  const nextForm = async () => {
     const newIndex = formIndex + 1;
 
     // if you have passed the end of the form array, go back to progress
     if (newIndex === forms.length) {
-      navigation.navigate('Progress', {
-        go_back_key: navigation.state.key,
-        username: navigation.getParam('username', 'Error_User'),
-        studyIndex: formIndex,
-        formIndex: newIndex,
-      });
+      props.navigation.navigate('Progress');
     } else {
       try {
         const { token } = this.state;
@@ -227,96 +172,61 @@ export default class FormWrapper extends Component {
         });
         await response.json();
       } catch (error) {
-        navigation.navigate('Progress', {});
+        props.navigation.navigate('Progress', {});
       }
       this.setState({
         formIndex: newIndex,
         questionIndex: -1,
       });
     }
-  }
+  };
 
-  render() {
-    const screenWidth = Math.round(Dimensions.get('window').width);
-    const { navigation } = this.props;
-    const { forms, formIndex, questionIndex, isLoading } = this.state;
-    if (isLoading) {
-      return (
-        <View style={styles.container}>
-          <Header
-            alignSelf="center"
-            centerComponent={{
-              text: 'MindTrails',
-              style: { fontSize: 24, color: '#fff' },
-            }}
-            rightComponent={
-              <Icon
-                onPress={() =>
-                  navigation.navigate('Progress', {
-                    formIndex,
-                    questionIndex,
-                    numForms: forms.length,
-                  })
-                }
-                size={35}
-                name="home"
-                type="font-awesome"
-                color="white"
-              />
+  return (
+    <View style={styles.container}>
+      <Header
+        alignSelf="center"
+        centerComponent={{
+          text: 'MindTrails',
+          style: { fontSize: 24, color: '#fff' },
+        }}
+        rightComponent={
+          <Icon
+            onPress={() =>
+              props.navigation.navigate('Progress', {
+                formIndex,
+                questionIndex,
+                numForms: forms.length,
+              })
             }
+            size={35}
+            name="home"
+            type="font-awesome"
+            color="white"
           />
+        }
+      />
+      {!atEnd && !atBeginning && (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Progress.Bar
+            style={{ alignSelf: 'center' }}
+            progress={(questionIndex + 1) / forms[formIndex].fields.length}
+            unfilledColor="#F5F5F5"
+            borderColor="grey"
+            color="#48AADF"
+            height={20}
+            width={screenWidth * 0.93}
+            borderRadius={3}
+          >
+            <AppText style={{ position: 'absolute', alignSelf: 'center', fontSize: 15 }}>
+              {questionIndex + 1}/{forms[formIndex].fields.length}
+            </AppText>
+          </Progress.Bar>
         </View>
-      );
-    }
-    const atEnd = questionIndex === forms[formIndex].fields.length; // checks if user is at last question in form
-    const atBeginning = questionIndex === -1; // checks if user has not begun form
-    return (
-      <View style={styles.container}>
-        <Header
-          alignSelf="center"
-          centerComponent={{
-            text: 'MindTrails',
-            style: { fontSize: 24, color: '#fff' },
-          }}
-          rightComponent={
-            <Icon
-              onPress={() =>
-                navigation.navigate('Progress', {
-                  formIndex,
-                  questionIndex,
-                  numForms: forms.length,
-                })
-              }
-              size={35}
-              name="home"
-              type="font-awesome"
-              color="white"
-            />
-          }
-        />
-        {!atEnd && !atBeginning && (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Progress.Bar
-              style={{ alignSelf: 'center' }}
-              progress={(questionIndex + 1) / forms[formIndex].fields.length}
-              unfilledColor="#F5F5F5"
-              borderColor="grey"
-              color="#48AADF"
-              height={20}
-              width={screenWidth * 0.93}
-              borderRadius={3}
-            >
-              <AppText style={{ position: 'absolute', alignSelf: 'center', fontSize: 15 }}>
-                {questionIndex + 1}/{forms[formIndex].fields.length}
-              </AppText>
-            </Progress.Bar>
-          </View>
-        )}
-        {this.toRender(forms[formIndex])}
-      </View>
-    );
-  }
-}
+      )}
+      {toRender(forms[formIndex])}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -344,3 +254,5 @@ const styles = StyleSheet.create({
     flex: 9,
   },
 });
+
+export default FormWrapper;

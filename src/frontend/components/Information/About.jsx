@@ -3,35 +3,26 @@ import { Header, Button, Card, Divider } from 'react-native-elements';
 import { StyleSheet, ScrollView, View, Linking, Alert } from 'react-native';
 import AppText from '../AppText.jsx';
 
-export default function About(props) {
-  const { navigation } = props;
+const About = (props) => {
   async function openURL() {
     try {
       await Linking.openURL('mailto:studyteam@mindtrails.org');
     } catch (error) {
-      // console.log(error);
       Alert.alert("Couldn't Open Mail App", 'Unfortunately, we were unable to open your mail client');
     }
   }
   return (
     <View style={{ flex: 1, backgroundColor: '#E5E7ED' }}>
-      <Header
-        alignSelf="center"
-        centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }}
-      />
+      <Header alignSelf="center" centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }} />
       <ScrollView style={styles.scrollContainer}>
-        <Card
-          title={<AppText style={styles.title}>About</AppText>}
-          borderRadius={5}
-        >
+        <Card title={<AppText style={styles.title}>About</AppText>} borderRadius={5}>
           <Divider />
           <AppText style={styles.body}>
             The MindTrails Project is a web-based, public research site that offers free interpretation bias training
             programs to promote healthier thinking patterns for people with anxiety and other emotional difficulties.
             Research shows that people prone to anxiety tend to think about situations negatively. MindTrails programs
-            give you practice thinking about situations in new ways. This encourages more flexible thinking styles in your
-            everyday life. Learn more
-            {' '}
+            give you practice thinking about situations in new ways. This encourages more flexible thinking styles in
+            your everyday life. Learn more{' '}
             <AppText
               style={{ color: '#48AADF' }}
               onPress={() => Linking.openURL('https://mindtrails.virginia.edu/calm/public/researchSupport')}
@@ -43,15 +34,12 @@ export default function About(props) {
           <AppText style={styles.body}>
             Developed by an interdisciplinary team of clinical psychologists, computer scientists, and engineers at the
             University of Virginia, MindTrails aims to efficiently test which training programs work best for different
-            people and problem areas. We strive to continually improve these programs for the next generation. Our team is
-            excited to learn whether these programs can help address the desperate need for greater delivery of care that
-            has good research support.
+            people and problem areas. We strive to continually improve these programs for the next generation. Our team
+            is excited to learn whether these programs can help address the desperate need for greater delivery of care
+            that has good research support.
           </AppText>
         </Card>
-        <Card
-          title={<AppText style={styles.contactTitle}>Contact Us</AppText>}
-          borderRadius={5}
-        >
+        <Card title={<AppText style={styles.contactTitle}>Contact Us</AppText>} borderRadius={5}>
           <Divider />
           <Button
             buttonStyle={{ backgroundColor: '#48AADF' }}
@@ -64,10 +52,7 @@ export default function About(props) {
             title="studyteam@mindtrails.org"
           />
         </Card>
-        <Card
-          title={<AppText style={styles.contactTitle}>Calm Thinking Study</AppText>}
-          borderRadius={5}
-        >
+        <Card title={<AppText style={styles.contactTitle}>Calm Thinking Study</AppText>} borderRadius={5}>
           <Divider />
           <AppText style={styles.body}>
             We are currently offering free training programs as part of a study on promoting healthier thinking patterns
@@ -81,13 +66,15 @@ export default function About(props) {
               alignSelf: 'center',
             }}
             title="Check Eligibility"
-            onPress={() => navigation.navigate('Eligibility Questionnaire', { go_back_key: navigation.state.key })}
+            onPress={() =>
+              props.navigation.navigate('Eligibility Questionnaire', { go_back_key: props.navigation.state.key })
+            }
           />
         </Card>
       </ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -125,3 +112,5 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+
+export default About;

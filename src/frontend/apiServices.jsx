@@ -1,6 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
-const apiPath = 'http://mindtrails-flask-env.eba-4iqbibpk.us-east-1.elasticbeanstalk.com/api/';
+// const apiPath = 'http://mindtrails-flask-env.eba-4iqbibpk.us-east-1.elasticbeanstalk.com/api/';
+const apiPath = 'http://127.0.0.1:5000/api/';
 
 const errors = {
   error: 'There was an error creating your account, please try again.',
@@ -59,6 +60,29 @@ async function post(path, data, needsToken) {
 }
 
 export default {
+  async register(data) {
+    const path = `${apiPath}signup`;
+    const response = await post(path, data, false);
+    return {
+      code: response.code,
+      errorMessage: errors[response.code],
+    };
+  },
+  async login(data) {
+    const path = `${apiPath}login`;
+    const response = await post(path, data, false);
+    if (response.code == 'success') {
+      const userToken = { token: response.token };
+      await SecureStore.setItemAsync('userToken', JSON.stringify(userToken));
+    }
+    return response;
+  },
+  async getForms(token) {
+    const path = `${apiPath}allforms`;
+    const response = await get(path, token);
+    console.log(response);
+    return response;
+  },
   async saveAnswers(token, formName, questionIndex, answer) {
     try {
       const postBody = {
@@ -92,27 +116,5 @@ export default {
       console.log('Error submitting answers');
       return false;
     }
-  },
-  async register(data) {
-    const path = `${apiPath}signup`;
-    const response = await post(path, data, false);
-    return {
-      code: response.code,
-      errorMessage: errors[response.code],
-    };
-  },
-  async login(data) {
-    const path = `${apiPath}login`;
-    const response = await post(path, data, false);
-    if (response.code == 'success') {
-      const userToken = { token: response.token };
-      await SecureStore.setItemAsync('userToken', JSON.stringify(userToken));
-    }
-    return response;
-  },
-  async progress(token) {
-    const path = `${apiPath}login`;
-    const response = await get(path, true);
-    const { formIndex, questionIndex, forms } = response;
   },
 };

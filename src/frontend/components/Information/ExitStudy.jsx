@@ -3,7 +3,7 @@ import { StyleSheet, ScrollView, Text, View, Linking, TextInput, Alert } from 'r
 import { Card, Divider, Button, Header, Icon } from 'react-native-elements';
 import AppText from '../AppText.jsx';
 
-export default class ChangePassword extends Component {
+export default class ExitStudy extends Component {
   constructor(props) {
     super(props);
   }
@@ -34,7 +34,7 @@ export default class ChangePassword extends Component {
         <Header
           alignSelf="center"
           centerComponent={{ text: 'MindTrails', style: { fontSize: 24, color: '#fff' } }}
-          rightComponent={(
+          rightComponent={
             <Icon
               onPress={() => this.props.navigation.toggleDrawer()}
               size={40}
@@ -42,18 +42,15 @@ export default class ChangePassword extends Component {
               type="evilicon"
               color="white"
             />
-          )}
+          }
         />
         <ScrollView style={styles.scrollContainer}>
-          <Card
-            title={<AppText style={styles.title}>Exiting the Study</AppText>}
-            borderRadius={5}
-          >
+          <Card title={<AppText style={styles.title}>Exiting the Study</AppText>} borderRadius={5}>
             <Divider style={{ marginBottom: '3%' }} />
             <AppText style={styles.body}>
               Thank you for your participation in the Calm Thinking Study. Before you decide to exit, please let us know
-              if there are questions or concerns we can address — we are very interested in making this study work for all
-              who have kindly agreed to participate, so let us know if we can help make it work for you.
+              if there are questions or concerns we can address — we are very interested in making this study work for
+              all who have kindly agreed to participate, so let us know if we can help make it work for you.
             </AppText>
             {/* <AppTextInput
                   style={styles.input}
