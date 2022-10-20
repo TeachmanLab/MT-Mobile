@@ -71,7 +71,7 @@
     "react-native-modal-selector": "^1.1.4",
     "react-native-progress": "^4.1.2",
     "react-native-read-more-text": "^1.1.0",
-    "react-native-reanimated": "^1.2.0",
+    "react-native-reanimated": "^2.10.0",
     "react-native-screens": "~1.0.0-alpha.23",
     "react-native-slider": "^0.11.0",
     "react-native-vector-icons": "^6.0.0",
